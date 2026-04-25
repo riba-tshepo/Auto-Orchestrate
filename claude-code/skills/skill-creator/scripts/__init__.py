@@ -1,1 +1,0 @@
-"""Skill creator scripts package."""

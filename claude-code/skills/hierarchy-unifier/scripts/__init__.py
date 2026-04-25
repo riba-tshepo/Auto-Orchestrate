@@ -1,1 +1,0 @@
-"""Hierarchy unifier scripts package."""
