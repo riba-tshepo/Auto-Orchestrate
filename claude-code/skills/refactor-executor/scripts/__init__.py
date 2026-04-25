@@ -1,0 +1,1 @@
+"""Refactor splitter scripts package."""

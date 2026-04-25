@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FailurePatterns",
+  "description": "Accumulated failure patterns from improvement_recommender",
+  "type": "object",
+  "required": ["schema_version", "patterns"],
+  "properties": {
+    "schema_version": { "type": "integer", "minimum": 1 },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "patterns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["fingerprint", "category", "frequency"],
+        "properties": {
+          "fingerprint": { "type": "string", "description": "Normalized error signature" },
+          "category": { "type": "string" },
+          "frequency": { "type": "integer", "minimum": 1 },
+          "last_seen_run": { "type": "integer" },
+          "first_seen_run": { "type": "integer" },
+          "decay_score": { "type": "number", "minimum": 0, "maximum": 1 },
+          "stages": { "type": "array", "items": { "type": "string" } },
+          "sample_errors": { "type": "array", "items": { "type": "string" }, "maxItems": 3 }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,134 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GateState",
+  "description": "Runtime gate state for a single project session. Created by /gate-review on first use, read by /new-project, /workflow, /sprint-ceremony, /gate-review.",
+  "type": "object",
+  "required": ["session_id", "project_name", "last_updated", "gates"],
+  "additionalProperties": false,
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "pattern": "^auto-orc-[0-9]{8}-[a-z0-9-]+$",
+      "description": "Session identifier in format auto-orc-YYYYMMDD-{slug}"
+    },
+    "project_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable project name"
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of the most recent write to this file"
+    },
+    "schema_version": {
+      "type": "string",
+      "enum": ["1.0"],
+      "description": "Schema version for forward compatibility. Must be '1.0' for this schema."
+    },
+    "gates": {
+      "type": "object",
+      "required": [
+        "gate_1_intent_review",
+        "gate_2_scope_lock",
+        "gate_3_dependency_acceptance",
+        "gate_4_sprint_readiness"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "gate_1_intent_review": {
+          "$ref": "#/definitions/gate",
+          "description": "Gate 1: Intent Review (P-004). Owner: Product Manager + Engineering Manager. 7 checklist items."
+        },
+        "gate_2_scope_lock": {
+          "$ref": "#/definitions/gate",
+          "description": "Gate 2: Scope Lock (P-013). Owner: Product Manager. 8 checklist items."
+        },
+        "gate_3_dependency_acceptance": {
+          "$ref": "#/definitions/gate",
+          "description": "Gate 3: Dependency Acceptance (P-019). Owner: Technical Program Manager. 6 checklist items."
+        },
+        "gate_4_sprint_readiness": {
+          "$ref": "#/definitions/gate",
+          "description": "Gate 4: Sprint Readiness (P-025). Owner: Engineering Manager + Tech Lead. 6 checklist items."
+        }
+      }
+    }
+  },
+  "definitions": {
+    "gate": {
+      "type": "object",
+      "required": [
+        "status",
+        "owner",
+        "checklist_items_total",
+        "checklist_items_passed",
+        "last_reviewed"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in_review", "passed", "failed"],
+          "description": "Current gate status. Valid transitions: pending→in_review, in_review→passed, in_review→failed, failed→in_review, passed→in_review (--reopen only). Invalid: pending→passed, pending→failed, passed→failed, passed→pending."
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Role or person responsible for gate passage"
+        },
+        "checklist_items_total": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Total number of checklist items for this gate"
+        },
+        "checklist_items_passed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of checklist items confirmed passed in the last review"
+        },
+        "last_reviewed": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of the most recent gate review. Null if gate has never been reviewed."
+        },
+        "reviewed_by": {
+          "type": ["string", "null"],
+          "description": "Identity of the agent or user who performed the most recent review. Null if never reviewed."
+        },
+        "pass_timestamp": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when gate status became 'passed'. Null if not yet passed."
+        },
+        "fail_reason": {
+          "type": ["string", "null"],
+          "description": "Human-readable reason for gate failure. Required when status is 'failed'. Null otherwise."
+        },
+        "override": {
+          "type": ["object", "null"],
+          "description": "Authorized gate override. When non-null, enforcement is waived for this gate only.",
+          "required": ["reason", "authorized_by", "timestamp"],
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "type": "string",
+              "minLength": 10,
+              "description": "Detailed justification for the override. Must be at least 10 characters."
+            },
+            "authorized_by": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Name or role of the person who authorized this override"
+            },
+            "timestamp": {
+              "type": "string",
+              "format": "date-time",
+              "description": "ISO 8601 timestamp when the override was authorized"
+            }
+          }
+        }
+      }
+    }
+  }
+}
