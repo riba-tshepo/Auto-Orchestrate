@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AuditReceipt",
+  "description": "Completion receipt for an auto-audit session. Written by auto-audit Step 7 on termination. Distinct from cycle-level stage-receipt.json.",
+  "type": "object",
+  "required": ["schema_version", "session_id", "type", "verdict", "final_compliance_score", "compliance_threshold", "timestamp", "cycle_count"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": ["1.0"],
+      "description": "Schema version. Currently only '1.0' is valid."
+    },
+    "session_id": {
+      "type": "string",
+      "pattern": "^auto-aud-[0-9]{8}-[a-z0-9-]+$",
+      "description": "Audit session identifier. Pattern: auto-aud-YYYYMMDD-{slug}"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["audit"],
+      "description": "Always 'audit' for this schema."
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["fully_compliant", "acceptable_compliance", "max_cycles_reached", "stalled", "user_stopped"],
+      "description": "Final audit verdict corresponding to auto-audit terminal states."
+    },
+    "final_compliance_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Compliance percentage from the last completed audit cycle. Range: 0-100."
+    },
+    "compliance_threshold": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "The threshold configured for this session. Score >= threshold = ACCEPTABLE."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the audit session terminated."
+    },
+    "cycle_count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Total number of audit cycles completed (minimum 1 — at least one audit ran)."
+    },
+    "gap_count": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "description": "Number of gaps remaining at termination. Null if not tracked."
+    },
+    "next_steps": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Suggested next steps based on verdict. Array of human-readable strings."
+    },
+    "related_orchestrate_session": {
+      "type": ["string", "null"],
+      "description": "Session ID of the most recent auto-orchestrate session remediated against. Null if none."
+    }
+  }
+}

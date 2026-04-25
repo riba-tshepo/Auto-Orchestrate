@@ -1,0 +1,579 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "manifest.schema.json",
+  "title": "Plugins AI Manifest",
+  "description": "Schema for validating the plugins-ai manifest.json structure",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "name",
+    "description",
+    "updated_at",
+    "stats",
+    "agents",
+    "skills",
+    "commands",
+    "processes",
+    "shared"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the manifest schema"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Name of the plugin collection"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Description of the plugin collection"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the manifest was last updated (ISO 8601 date string)"
+    },
+    "stats": {
+      "$ref": "#/$defs/Stats"
+    },
+    "agents": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Agent"
+      },
+      "description": "List of agent definitions"
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Skill"
+      },
+      "description": "List of skill definitions"
+    },
+    "commands": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Command"
+      },
+      "description": "List of command definitions"
+    },
+    "processes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Process"
+      },
+      "description": "List of process definitions"
+    },
+    "shared": {
+      "$ref": "#/$defs/Shared"
+    }
+  },
+  "$defs": {
+    "Stats": {
+      "type": "object",
+      "required": [
+        "total_skills",
+        "total_agents",
+        "total_commands",
+        "total_protocols",
+        "total_templates",
+        "total_style_guides",
+        "total_processes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "total_skills": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of skills"
+        },
+        "total_agents": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of agents"
+        },
+        "total_commands": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of commands"
+        },
+        "total_protocols": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of protocols"
+        },
+        "total_templates": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of templates"
+        },
+        "total_style_guides": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of style guides"
+        },
+        "total_processes": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of processes"
+        },
+        "total_references": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of references"
+        },
+        "total_tokens": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of tokens"
+        },
+        "total_schemas": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of schemas"
+        }
+      }
+    },
+    "Agent": {
+      "type": "object",
+      "required": [
+        "name",
+        "description",
+        "model",
+        "tools",
+        "dispatch_triggers",
+        "capabilities",
+        "path"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Agent name"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Agent description"
+        },
+        "model": {
+          "type": "string",
+          "pattern": "^(sonnet|opus|haiku|claude-(sonnet|opus|haiku)-\\d+-\\d+(-\\d+)?)$",
+          "description": "Claude model variant: short alias (sonnet|opus|haiku) or full model ID (claude-{family}-{major}-{minor}[-YYYYMMDD])"
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "List of tools available to this agent"
+        },
+        "dispatch_triggers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Trigger phrases or patterns that activate this agent"
+        },
+        "capabilities": {
+          "type": "object",
+          "description": "Key-value map of agent capabilities"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Filesystem path to the agent definition"
+        },
+        "activation_rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ActivationRule"
+          },
+          "description": "Conditional activation rules for domain-agent review (AGENT-ACTIVATE-001)"
+        },
+        "skills_orchestrated": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Names of skills orchestrated/invoked by this agent"
+        }
+      }
+    },
+    "ActivationRule": {
+      "type": "object",
+      "required": ["rule_id", "trigger_stage", "condition"],
+      "additionalProperties": false,
+      "properties": {
+        "rule_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique identifier for the activation rule (e.g., ACT-001)"
+        },
+        "trigger_stage": {
+          "type": "number",
+          "description": "Pipeline stage at which the rule is evaluated"
+        },
+        "condition": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Condition that must hold for activation"
+        },
+        "keywords": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Keywords that satisfy the condition when present in artifacts"
+        },
+        "review_scope": {
+          "type": "string",
+          "description": "Scope of the domain agent's review"
+        }
+      }
+    },
+    "Skill": {
+      "type": "object",
+      "required": [
+        "name",
+        "description",
+        "dispatch_triggers",
+        "has_scripts",
+        "has_references",
+        "path"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Skill name"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Skill description"
+        },
+        "dispatch_triggers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Trigger phrases or patterns that activate this skill"
+        },
+        "has_scripts": {
+          "type": "boolean",
+          "description": "Whether this skill includes executable scripts"
+        },
+        "has_references": {
+          "type": "boolean",
+          "description": "Whether this skill includes reference documents"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Filesystem path to the skill definition"
+        },
+        "chaining": {
+          "$ref": "#/$defs/Chaining"
+        },
+        "capabilities": {
+          "type": "object",
+          "description": "Key-value map of skill capabilities"
+        }
+      }
+    },
+    "Chaining": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "produces": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Artifacts this skill produces"
+        },
+        "consumes_from": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Components this skill consumes input from"
+        },
+        "chains_to": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Components downstream of this skill"
+        },
+        "chains_from": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Components upstream of this skill"
+        },
+        "patterns": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Pipeline-chaining patterns this skill participates in"
+        }
+      }
+    },
+    "Command": {
+      "type": "object",
+      "required": ["name", "description", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Command name"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Command description"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Filesystem path to the command definition"
+        }
+      }
+    },
+    "Process": {
+      "type": "object",
+      "required": ["name", "path", "category", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Process name"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Filesystem path to the process definition"
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Process category (e.g., handbook, category)"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Process description"
+        }
+      }
+    },
+    "Shared": {
+      "type": "object",
+      "required": [
+        "protocols",
+        "templates",
+        "style_guides",
+        "tokens",
+        "references",
+        "python_library"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "protocols": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NamedResource"
+          },
+          "description": "Shared protocol definitions"
+        },
+        "templates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NamedResource"
+          },
+          "description": "Shared template definitions"
+        },
+        "style_guides": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NamedResource"
+          },
+          "description": "Shared style guide definitions"
+        },
+        "tokens": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NamedResource"
+          },
+          "description": "Shared token definitions"
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Reference"
+          },
+          "description": "Shared reference documents"
+        },
+        "python_library": {
+          "$ref": "#/$defs/PythonLibrary"
+        },
+        "lib_libraries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/LibLibrary"
+          },
+          "description": "Top-level Python libraries under lib/ (e.g., ci_engine, domain_memory) that are installed and consumed by agents and commands but live outside skills/_shared/python/"
+        }
+      }
+    },
+    "LibLibrary": {
+      "type": "object",
+      "required": ["name", "base_path", "description", "modules", "test_directory"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Library name (matches the directory under lib/)"
+        },
+        "base_path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Filesystem path to the library root (e.g., lib/ci_engine/)"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Description of the library's purpose and consumers"
+        },
+        "modules": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Module names exported by this library (top-level .py files, excluding __init__.py)"
+        },
+        "schemas": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Filesystem paths to JSON schemas owned by this library (may be empty)"
+        },
+        "test_directory": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Filesystem path to the library's test directory"
+        }
+      }
+    },
+    "NamedResource": {
+      "type": "object",
+      "required": ["name", "description", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Resource name"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Resource description"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Filesystem path to the resource"
+        }
+      }
+    },
+    "Reference": {
+      "type": "object",
+      "required": ["name", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Reference name"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Filesystem path to the reference"
+        }
+      }
+    },
+    "PythonLibrary": {
+      "type": "object",
+      "required": ["base_path", "layers", "test_directory"],
+      "additionalProperties": false,
+      "properties": {
+        "base_path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Base filesystem path of the Python library"
+        },
+        "layers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Ordered list of library layers"
+        },
+        "test_directory": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to the test directory for the Python library"
+        },
+        "modules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PythonModule"
+          },
+          "description": "Library modules with their layer, path, and exported symbols"
+        }
+      }
+    },
+    "PythonModule": {
+      "type": "object",
+      "required": ["name", "layer", "path", "test_path", "description", "exports"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Module name"
+        },
+        "layer": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Library layer the module belongs to"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Filesystem path to the module"
+        },
+        "test_path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Filesystem path to the module's test file"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Module description"
+        },
+        "exports": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Symbols exported by the module"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ImprovementLogEntry",
+  "description": "Single JSONL entry from improvement_log.jsonl",
+  "type": "object",
+  "required": ["timestamp", "session_id", "type"],
+  "properties": {
+    "timestamp": { "type": "string", "format": "date-time" },
+    "session_id": { "type": "string" },
+    "run_sequence": { "type": "integer", "minimum": 1 },
+    "type": {
+      "type": "string",
+      "enum": ["observation", "action", "regression", "improvement"],
+      "description": "Entry type"
+    },
+    "stage": { "type": "string" },
+    "category": { "type": "string" },
+    "description": { "type": "string" },
+    "kpi_name": { "type": "string" },
+    "kpi_value": { "type": "number" },
+    "baseline_value": { "type": "number" },
+    "delta_pct": { "type": "number" },
+    "severity": {
+      "type": "string",
+      "enum": ["info", "warning", "critical"]
+    }
+  }
+}

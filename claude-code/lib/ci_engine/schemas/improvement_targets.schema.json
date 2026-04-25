@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ImprovementTargets",
+  "description": "Prioritized improvement targets from ImprovementRecommender.generate_targets()",
+  "type": "object",
+  "required": ["schema_version", "generated_at", "targets"],
+  "properties": {
+    "schema_version": { "type": "integer", "minimum": 1 },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "priority", "action", "category"],
+        "properties": {
+          "id": { "type": "string" },
+          "priority": { "type": "integer", "minimum": 1 },
+          "action": { "type": "string", "description": "Recommended improvement action" },
+          "category": { "type": "string" },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "evidence_runs": { "type": "integer", "minimum": 0 },
+          "decay_score": { "type": "number", "minimum": 0, "maximum": 1 },
+          "stage": { "type": "string" },
+          "root_cause": { "type": "string" },
+          "first_seen_run": { "type": "integer" },
+          "last_seen_run": { "type": "integer" }
+        }
+      }
+    }
+  }
+}

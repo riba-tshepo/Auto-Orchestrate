@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "StageTelemetryEvent",
+  "description": "Single JSONL event from stage_telemetry.jsonl",
+  "type": "object",
+  "required": ["event_type", "timestamp"],
+  "properties": {
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "run_start", "stage_start", "stage_end", "stage_error",
+        "stage_retry", "stage_skip", "ooda_decision", "run_finalize"
+      ]
+    },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "schema_version": { "type": "integer", "minimum": 1 },
+    "session_id": { "type": "string" },
+    "run_sequence": { "type": "integer", "minimum": 1 },
+    "stage_name": { "type": "string" },
+    "stage_number": { "type": "integer" },
+    "data": {
+      "type": "object",
+      "description": "Event-specific payload",
+      "properties": {
+        "status": { "type": "string" },
+        "duration_seconds": { "type": "number" },
+        "error_count": { "type": "integer" },
+        "retry_count": { "type": "integer" },
+        "error_messages": { "type": "array", "items": { "type": "string" } },
+        "token_input": { "type": "integer" },
+        "token_output": { "type": "integer" },
+        "success_rate": { "type": "number" },
+        "composite_score": { "type": "number" },
+        "decision": { "type": "string" },
+        "category": { "type": "string" },
+        "confidence": { "type": "number" }
+      }
+    }
+  }
+}
